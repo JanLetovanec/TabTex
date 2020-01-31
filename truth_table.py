@@ -22,18 +22,16 @@ def execute(inputs, terms):
 
 def get_row(state, fs):
     """ Generates next row string """
-    input_strings = []
+    input_row = []
     for bool_val in state:
-        value = ("0", "1")[bool_val]
-        input_strings.append(value)
+        value = (False, True)[bool_val]
+        input_row.append(value)
 
-    output_string = []
+    output_row = []
     for terms in fs:
-        output_string.append(execute(state, terms))
+        output_row.append(execute(state, terms))
 
-    input_row = "\t&\t".join(input_strings)
-    output_row = "\t&\t".join(output_string)
-    row = input_row + "\t&\t" + output_row + "\t\\\\"
+    row = input_row + output_row
     return row
 
 
@@ -49,29 +47,29 @@ def generate_input(input_var):
 
 
 def truth_table(variable_num, fs):
-    """ Generates truth table """
+    """
+    Generates truth table for custom functions
+    :param variable_num: number of variables appearing in functions
+    :param fs: a list of boolean functions of those variables,
+    function is a list of terms in SOP form (considered || together)
+    term is a list of literals (considered && together)
+    literal is an integer, negative values are considered as negated,
+    magnitude of the integer is order of the variable (i.e. -1 is not first variable)
+    :return: resulting table, first variable_num columns are inputs,
+    then every column corresponds to one provided function
+    """
     inputs = [False]*variable_num
     zero = [False]*variable_num
+    result = []
 
     while True:
         row = get_row(inputs, fs)
-        print(row)
+        result.append(row)
         generate_input(inputs)
         if inputs == zero:
             break
 
+    return result
 
-if __name__ == '__main__':
-    my_var_num = 2
-    my_f1 = [
-        [-1,-2,-3],
-        [1,-3,-4],
-        [-1,3,4],
-        [2,3,-4],
-        [-2,3,4]
-    ]
-    my_f2 = [
-        [-1]
-    ]
-    truth_table(my_var_num, [my_f2])
-    # truth_table(my_var_num, [my_f2, my_f1])
+# TODO: add some more user-friendly way of inputting functions
+
